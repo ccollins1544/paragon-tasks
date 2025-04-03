@@ -1,0 +1,20 @@
+{
+  "name": "pearagon-task1",
+  "version": "1.0.0",
+  "description": "Command line app to search for a book by title",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js book search"
+  },
+  "author": "Christopher Collins",
+  "license": "ISC",
+  "devDependencies": {
+    "commander": "^13.1.0",
+    "inquirer": "^12.5.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
