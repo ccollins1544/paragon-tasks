@@ -1,35 +1,56 @@
 import "dotenv/config";
 import { program } from "commander";
 import inquirer from "inquirer";
-import { searchBook } from "./booksApi.js";
-import { capitalizeFirstLetter } from "./helpers.js";
+import { capitalizeFirstLetter, asyncForEach } from "./helpers.js";
+import { searchBook, getBookAuthors } from "./booksApi.js";
 
-const main = async ({ title } = {}) => {
+const getBookInfo = async ({ title } = {}) => {
+  // Clean the title to be used for the search
   const cleanTitle = title
     .trim()
     .split(" ")
     .map((word) => capitalizeFirstLetter(word))
     .join(" ");
 
+  // Search for the book by title
   const results = await searchBook(cleanTitle);
   if (results.error) {
     console.log(results.error);
     return;
   }
 
-  let bookInfo = `${results.title}, ${results.description}`;
-
   // Get Authors if available
   let authorsList = [];
   if (results?.authors.length > 0) {
-    // @todo_cc
-    console.log("authors", results.authors);
+    await asyncForEach(results.authors, async (authorId) => {
+      const authorData = await getBookAuthors(authorId);
+      const { firstName, lastName, middleInitial, error } = authorData || {};
+      if (error) {
+        console.log(error);
+        return; // Skip this iteration if there is an error fetching the author data
+      }
+
+      let authorFullName = "";
+      if (firstName) {
+        authorFullName += firstName;
+      }
+      if (middleInitial) {
+        authorFullName += ` ${middleInitial}`;
+      }
+      if (lastName) {
+        authorFullName += ` ${lastName}`;
+      }
+      if (authorFullName) {
+        authorsList.push(authorFullName);
+      }
+    });
   }
 
+  // Display the book info for the user to see
+  let bookInfo = `${results.title}, ${results.description}`;
   if (authorsList.length > 0) {
     bookInfo += `, ${authorsList.join(", ")}`;
   }
-
   console.log(bookInfo);
 };
 
@@ -45,7 +66,7 @@ program
           message: "Enter the title of a book to search for:",
         },
       ]);
-      await main(answer);
+      await getBookInfo(answer);
     }
   });
 
