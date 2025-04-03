@@ -2,9 +2,14 @@ import "dotenv/config";
 import { program } from "commander";
 import inquirer from "inquirer";
 import { capitalizeFirstLetter, asyncForEach } from "./helpers.js";
-import { searchBook, getBookAuthors } from "./booksApi.js";
+import { searchBook, getBookAuthors, DEFAULT_TTL, CLEAN_EXPIRED_CACHE_INTERVAL } from "./booksApi.js";
 
 const getBookInfo = async ({ title } = {}) => {
+  if (!title) {
+    console.log("Title is required");
+    return;
+  }
+
   // Clean the title to be used for the search
   const cleanTitle = title
     .trim()
@@ -58,6 +63,8 @@ program
   .command("book search")
   .description("Search for a book by title")
   .action(async () => {
+    console.log(`Default TTL: ${DEFAULT_TTL / 1000} seconds`);
+    console.log(`Clean expired cache interval: ${CLEAN_EXPIRED_CACHE_INTERVAL / 1000} seconds\n`);
     while (true) {
       const answer = await inquirer.prompt([
         {
