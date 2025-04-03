@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { increment, decrement, getCount, resetCount, setCount, multiply } from "../controllers/count.js";
+import { increment, getCount, resetCount } from "../controllers/count.js";
 
 router.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -8,10 +8,7 @@ router.get("/", (req, res) => {
 
 router.get("/count", getCount);
 router.post("/increment", increment);
-router.post("/decrement", decrement);
-router.post("/multiply", multiply);
 router.post("/reset", resetCount);
-router.post("/set", setCount);
 
 router.use((err, req, res, next) => {
   console.error(err.stack);

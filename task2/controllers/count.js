@@ -15,6 +15,24 @@ export const increment = (req, res) => {
   }
 };
 
+export const getCount = (req, res) => {
+  try {
+    return res.json({ count: count.value });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+export const resetCount = (req, res) => {
+  try {
+    count.reset();
+    return res.json({ count: count.value });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+/* 
 export const decrement = (req, res) => {
   let { decrement_by } = req.body || {};
   decrement_by = Number(decrement_by);
@@ -39,23 +57,6 @@ export const multiply = (req, res) => {
   }
 };
 
-export const getCount = (req, res) => {
-  try {
-    return res.json({ count: count.value });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-};
-
-export const resetCount = (req, res) => {
-  try {
-    count.reset();
-    return res.json({ count: count.value });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-};
-
 export const setCount = (req, res) => {
   const { value } = req.body;
 
@@ -66,3 +67,4 @@ export const setCount = (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
+*/

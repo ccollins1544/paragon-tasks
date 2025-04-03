@@ -1,3 +1,5 @@
+const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, seconds * 1000)); // DEV ONLY
+
 // Set the initial count on page load by /count route
 fetch("/count")
   .then((response) => response.json())
@@ -42,33 +44,32 @@ document.getElementById("counterForm").addEventListener("submit", async (event) 
   event.preventDefault(); // Prevent page reload
   let multiplier = Number(document.getElementById("multiplier").value);
 
-  try {
-    const response = await fetch("/multiply", {
+  // Multiply the count without using the /multiply route
+  let currentCount = await fetch("/count")
+    .then((response) => response.json())
+    .then((data) => {
+      return data.count;
+    });
+
+  const targetCount = currentCount * multiplier;
+
+  // Increment the count until it reaches the target count
+  while (currentCount < targetCount) {
+    await fetch("/increment", {
       headers: { "Content-Type": "application/json" },
       method: "POST",
-      body: JSON.stringify({ multiplier }),
+      body: JSON.stringify({ increment_by: 1 }),
     });
-    const contentType = response.headers.get("content-type");
+    currentCount = await fetch("/count")
+      .then((response) => response.json())
+      .then((data) => {
+        return data.count;
+      });
 
-    let data = null;
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-    const { count } = data || {};
-    if (count) {
-      document.getElementById("count").textContent = count;
-    } else {
-      document.getElementById("error").textContent = "Error Multiplying";
-    }
-  } catch (error) {
-    document.getElementById("error").textContent = "Error Multiplying";
-    console.error(error);
-  } finally {
-    // Clear the input field
-    document.getElementById("multiplier").value = "";
-    document.getElementById("error").textContent = "";
+    // Update the count display
+    document.getElementById("count").textContent = currentCount;
+
+    // await sleep(0.3); // DEV ONLY
   }
 });
 
